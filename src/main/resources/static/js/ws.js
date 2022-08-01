@@ -18,13 +18,14 @@ const onError = () => {
 }
 
 let message = {
-    sender: sessionStorage.getItem('username'),
+    sender: "",
     recipient: "",
     title: "",
     body: "",
 }
 
 const sendMessage = () => {
+    message.sender = sessionStorage.getItem('username');
     message.recipient = document.getElementById("recipient").value;
     message.title = document.getElementById("title").value;
     message.body = document.getElementById("message-body").value;
@@ -36,10 +37,11 @@ const sendMessage = () => {
 };
 
 const isValidMessage = () =>{
+    message.sender = message.sender.trim();
     message.recipient = message.recipient.trim();
     message.title = message.title.trim();
     message.body = message.body.trim();
-    return !(!message.recipient || !message.title || !message.body);
+    return !(!message.recipient || !message.title || !message.body || !message.sender);
 }
 
 const onMessageReceived = (newMessage) => {
