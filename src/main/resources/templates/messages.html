@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Messages</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/ws.js}"></script>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">Home</a>
+    </div>
+</nav>
+<div class="container main-container">
+    <h1 th:text="${'Hello, ' + #session.getAttribute('username')}"></h1>
+    <div class="row" style="height: 100%">
+        <div class="col-12 col-md-4">
+            <form class="text-center" th:object="${newMessage}">
+                <label class="row">Recipient
+                    <input type="text" id="recipient" maxlength="30" class="form-control">
+                </label>
+                <label class="row">Title
+                    <input type="text" id="title" maxlength="80" class="form-control">
+                </label>
+                <label class="row">Message
+                    <textarea class="form-control" id="message-body" style="resize: none"
+                              maxlength="255" rows="6"></textarea>
+                </label>
+                <input type="reset" onclick="sendMessage()" class="btn btn-primary mt-3" th:value="Send">
+            </form>
+        </div>
+        <div class="col-12 col-md-8 mt-4">
+            <div class="accordion" id="my-accordion">
+                <div class="accordion-item" th:each="message:${messages}">
+                    <h2 class="accordion-header" th:id="'heading'+${message.id}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                th:data-bs-target="${'#collapse'+message.id}" aria-expanded="false"
+                                th:aria-controls="${'collapse'+message.id}">
+                            <div style="width: 95%">
+                                <span>from:</span>
+                                <strong th:text="${message.sender}"></strong>
+                                <span class="float-end"
+                                      th:text="${#temporals.format(message.time,'dd.MM.yyyy, HH:mm:ss')}"></span>
+                                <p class="m-0 mt-3">
+                                    <span>title:</span>
+                                   <span style="word-break: break-word" th:text="${message.title}"></span>
+                                </p>
+                            </div>
+                        </button>
+                    </h2>
+                    <div th:id="${'collapse'+message.id}" class="accordion-collapse collapse"
+                         th:aria-labelledby="'#heading'+${message.id}"
+                         data-bs-parent="#my-accordion">
+                        <div class="accordion-body" th:text="${message.body}" style="word-break: break-word">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    sessionStorage.setItem('username', "[[${#session.getAttribute('username')}]]");
+    connect();
+</script>
+<script>
+    let recipients = "[[${recipients}]]";
+    recipients = recipients.slice(1, recipients.length - 1);
+    recipients = recipients.split(', ');
+    $(function () {
+        $("#recipient").autocomplete({
+            source: recipients
+        });
+    });
+</script>
+</body>
+</html>
